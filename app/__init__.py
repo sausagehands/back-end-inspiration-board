@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 import os
 # Import models, blueprints, and anything else needed to set up the app or database
+from app.routes.card_route import bp as card_bp
 from .db import db, migrate
 from .models.card import Card
 from .models.board import Board
@@ -9,6 +10,10 @@ from .models.board import Board
 
 def create_app(config=None):
     app = Flask(__name__)
+
+    # Register Blueprints here
+    app.register_blueprint(card_bp)
+    # app.register_blueprint(board_bp)
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
@@ -20,7 +25,7 @@ def create_app(config=None):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Register Blueprints 
 
     CORS(app)
+    app.config['CORS_HEADERS'] = 'Content-Type'
     return app
