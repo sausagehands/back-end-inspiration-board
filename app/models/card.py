@@ -4,7 +4,7 @@ from ..db import db
 
 class Card(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    title: Mapped[str]
+    message: Mapped[str] = mapped_column(server_default="")
     like_count: Mapped[int] = mapped_column(default=0)
     board_id: Mapped[int | None] = mapped_column(ForeignKey("board.id"))
     board: Mapped["Board"] = relationship(back_populates="cards")
@@ -12,7 +12,7 @@ class Card(db.Model):
     def to_dict(self):
         data = {
             'id': self.id,
-            'title': self.title,
+            'message': self.message,
             'like_count': self.like_count
         }
         if self.board_id:
@@ -23,8 +23,9 @@ class Card(db.Model):
     def from_dict(cls, dict_data: dict):
         card = Card(
             id=dict_data.get("id"),
-            title=dict_data["title"],
+            message=dict_data["message"],
+            board_id=dict_data.get("board_id"),
             like_count=dict_data.get("like_count", 0)
         )
         return card
-    
+
