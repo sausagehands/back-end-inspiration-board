@@ -28,21 +28,3 @@ class Card(db.Model):
             like_count=dict_data.get("like_count", 0)
         )
         return card
-
-def create_card(board_id, message):
-    if not message or not isinstance(message, str) or message.strip() == "":
-        raise ValueError({"details": "Invalid data: message cannot be empty"})
-
-    if len(message) > 40:
-        raise ValueError({"details": "Invalid data: message must be 40 characters or fewer"})
-
-    new_card = Card.from_dict({
-        "message": message
-    })
-    new_card.board_id = int(board_id)
-
-    db.session.add(new_card)
-    db.session.commit()
-
-    return new_card
-

@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, request, Response
+from flask import Blueprint, make_response, request, Response, abort
 from .route_utilities import validate_model, create_model, get_models_with_filters
 from app.models.card import Card
 from app.models.board import Board
@@ -12,29 +12,40 @@ def create_board():
     request_body = request.get_json()
     return create_model(Board, request_body)
 
-@bp.post("/<board_id>/card")
+@bp.post("/<board_id>/cards")
 def create_card(board_id):
-    # TODO: Check for board existence
+    board = validate_model(Board, board_id)
     request_body = request.get_json()
-    message = request_body.get("message")
 
-    if not message or not isinstance(message, str) or message.strip() == "":
-        return make_response({"details": "Invalid data: message cannot be empty"}, 400)
+    if not request_body or "message" not in request_body:
+        abort(make_response(
+            {"details": "Invalid request: missing message"},
+            400
+        ))
+
+    message = request_body["message"]
+
+    if not isinstance(message, str) or message.strip() == "":
+        abort(make_response(
+            {"details": "Invalid data: message cannot be empty"},
+            400
+        ))
 
     if len(message) > 40:
-        return make_response({"details": "Invalid data: message must be 40 characters or fewer"}, 400)
+        abort(make_response(
+            {"details": "Invalid data: message must be 40 characters or fewer"},
+            400
+        ))
 
-    try:
-        new_card = Card.from_dict(request_body)
-        new_card.board_id = int(board_id)
-
-    except KeyError:
-        return make_response({"details": "Invalid data"}, 400)
+    new_card = Card.from_dict({
+        "message": message,
+        "board_id": board.id
+    })
 
     db.session.add(new_card)
     db.session.commit()
 
-    return make_response({"id": new_card.id, "message": new_card.message}, 201)
+    return new_card.to_dict(), 201
 
 # READ
 @bp.get("")
@@ -45,6 +56,14 @@ def get_all_boards():
 def get_board_by_id(board_id):
     board = validate_model(Board, board_id)
     return board.to_dict()
+
+@bp.get("/<board_id>/cards")
+def get_cards_by_board(board_id):
+    board = validate_model(Board, board_id)
+    
+    cards_response = [card.to_dict() for card in board.cards]
+    
+    return cards_response
 
 # UPDATE
 @bp.put("/<board_id>")
