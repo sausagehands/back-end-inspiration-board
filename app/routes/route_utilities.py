@@ -35,9 +35,18 @@ def get_models_with_filters(cls, filters=None):
     
     if filters:
         for attribute, value in filters.items():
-            if hasattr(cls, attribute):
-                query = query.where(getattr(cls, attribute).ilike(f"%{value}%"))
+            if not hasattr(cls, attribute):
+                continue
+
+            column = getattr(cls, attribute)
+
+            try:
+                if column.type.python_type is str:
+                    query = query.where(column.ilike(f"%{value}%"))
+                else:
+                    query = query.where(column == value)
+            except (NotImplementedError, AttributeError):
+                continue
 
     models = db.session.scalars(query.order_by(cls.id))
-    models_response = [model.to_dict() for model in models]
-    return models_response
+    return [model.to_dict() for model in models]
