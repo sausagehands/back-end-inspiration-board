@@ -12,6 +12,32 @@ def create_board():
     request_body = request.get_json()
     return create_model(Board, request_body)
 
+@bp.post("/<board_id>/card")
+def create_card(board_id):
+    # TODO: Check for board existence
+    request_body = request.get_json()
+    message = request_body.get("message")
+
+    if not message or not isinstance(message, str) or message.strip() == "":
+        return make_response({"details": "Invalid data: message cannot be empty"}, 400)
+
+    if len(message) > 40:
+        return make_response({"details": "Invalid data: message must be 40 characters or fewer"}, 400)
+
+    try:
+        new_card = Card.from_dict(request_body)
+        new_card.board_id = int(board_id)
+
+    except KeyError:
+        return make_response({"details": "Invalid data"}, 400)
+
+    db.session.add(new_card)
+    db.session.commit()
+
+    return make_response({"id": new_card.id, "message": new_card.message}, 201)
+
+
+
 # READ
 @bp.get("")
 def get_all_boards():

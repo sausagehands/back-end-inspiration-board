@@ -23,4 +23,3 @@ class Board(db.Model):
     def from_dict(cls, board_data):
         new_board = cls(title=board_data["title"], owner=board_data["owner"])
         return new_board
-    
