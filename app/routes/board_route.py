@@ -36,8 +36,6 @@ def create_card(board_id):
 
     return make_response({"id": new_card.id, "message": new_card.message}, 201)
 
-
-
 # READ
 @bp.get("")
 def get_all_boards():
