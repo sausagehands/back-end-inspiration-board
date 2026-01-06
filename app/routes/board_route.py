@@ -11,6 +11,7 @@ bp = Blueprint("board_bp",__name__, url_prefix="/boards")
 def create_board():
     request_body = request.get_json()
     return create_model(Board, request_body)
+    
 
 @bp.post("/<board_id>/cards")
 def create_card(board_id):
