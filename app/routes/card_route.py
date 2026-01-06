@@ -42,6 +42,20 @@ def get_all_cards():
         )
     return cards_response
 
+#Update a card's message
+@bp.put("/<id>")
+def update_card(id):
+    card = validate_model(Card, id)
+    request_body = request.get_json()
+
+    if "message" not in request_body:
+        response = {"details": "Invalid request: missing message"}
+        return abort(make_response(response, 400))
+
+    card.message = request_body["message"]
+    db.session.commit()
+    print(card.to_dict())
+    return make_response(card.to_dict(), 200)
 
 # Delete a card
 @bp.delete("/<id>")

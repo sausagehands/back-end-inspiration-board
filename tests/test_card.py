@@ -16,9 +16,9 @@ def test_get_all_cards(client, one_card):
     assert response.status_code == 200
     assert response_body == [{
         "id": 1,
+        "title": "Alice travel to Newyork",
         "owner": "Alice",
-        "message":"Try something new every day",
-        "board": "Alice travel to Newyork",
+        "message":"Try something new every day",    
         "board_id": None,
     }]
 
@@ -35,9 +35,9 @@ def test_create_one_card(client):
     assert response_body == {
         "id": 1,
         "owner": "Alice",
+        "title": "Alice travel to Newyork",
         "message": "Try something new every day",
-        "like_count": 0,
-        "board": "Alice travel to Newyork",
+        "like_count": 0,    
         "board_id": None,
     }
 def test_create_card_missing_message(client):
