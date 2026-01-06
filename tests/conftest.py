@@ -43,6 +43,7 @@ def one_card(app):
                     like_count=0)
     db.session.add(new_card)
     db.session.commit()
+    return new_card
 
 @pytest.fixture
 def one_board(app):
@@ -51,6 +52,7 @@ def one_board(app):
     
     db.session.add(new_board)
     db.session.commit()
+    return new_board
 
 @pytest.fixture
 def board_with_two_cards(app):

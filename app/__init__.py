@@ -7,7 +7,6 @@ from .db import db, migrate
 from .models.card import Card
 from .models.board import Board
 
-
 def create_app(config=None):
     app = Flask(__name__)
 
