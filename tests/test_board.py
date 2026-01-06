@@ -1,7 +1,7 @@
 from app.models.board import Board
 import pytest
 
-# TEST BOARD MODEL:
+########## TEST BOARD MODEL:
 
 def test_to_dict_no_missing_data():
     # Arrange
@@ -81,7 +81,7 @@ def test_from_dict_with_extra_keys():
     # Assert
     assert new_board.title == "New Board"
 
-# TEST BOARD ROUTES:
+########## TEST BOARD ROUTES:
 
 def test_create_one_board(client):
     # Act
@@ -234,3 +234,50 @@ def test_get_cards_by_board_with_no_cards(client, one_board):
     # Assert
     assert response.status_code == 200
     assert response_body == []
+    
+def test_update_board(client, one_board):
+    # Arrange
+    test_data = {
+        "title": "New Board",
+        "owner": "Madi Rei"
+    }
+
+    # Act
+    response = client.put("/boards/1", json=test_data)
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
+def test_update_board_missing_record(client, one_board):
+    # Arrange
+    test_data = {
+        "title": "New Board",
+        "owner": "Madi Rei"
+    }
+
+    # Act
+    response = client.put("/boards/3", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"details": "Board 3 not found"}
+
+def test_delete_board(client, one_board):
+    # Act
+    response = client.delete("/boards/1")
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
+
+def test_delete_board_missing_record(client, one_board):
+    # Act
+    response = client.delete("/boards/3")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"details": "Board 3 not found"}
