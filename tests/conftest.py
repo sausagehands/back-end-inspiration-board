@@ -26,15 +26,12 @@ def app():
         db.create_all()
         yield app
 
-
     with app.app_context():
         db.drop_all()
-
 
 @pytest.fixture
 def client(app):
     return app.test_client()
-
 
 # This fixture gets called in every test that
 # references "one_card"
@@ -47,8 +44,6 @@ def one_card(app):
     db.session.add(new_card)
     db.session.commit()
 
-
-
 @pytest.fixture
 def one_board(app):
     new_board = Board(title="Build a habit of going outside daily",
@@ -57,4 +52,24 @@ def one_board(app):
     db.session.add(new_board)
     db.session.commit()
 
+@pytest.fixture
+def board_with_two_cards(app):
+    board = Board(title="Test Board", owner="Madi Rei")
+    db.session.add(board)
+    db.session.commit()
 
+    card_1 = Card(
+        message="A Message",
+        like_count=0,
+        board_id=board.id
+    )
+    card_2 = Card(
+        message="Another Message",
+        like_count=0,
+        board_id=board.id
+    )
+
+    db.session.add_all([card_1, card_2])
+    db.session.commit()
+
+    return board
